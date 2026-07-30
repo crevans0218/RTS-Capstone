@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spacecraft Telemetry Node - Capstone</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 40px auto; max-width: 800px; padding: 0 20px; color: #333; }
+        h1, h2, h3 { color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        .video-container { background: #eee; padding: 40px; text-align: center; border: 2px dashed #ccc; margin-bottom: 20px; }
+        code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+    <h1>Spacecraft Ground Command Telemetry Node</h1>
+    
+    <h2>Project Overview</h2>
+    <p>This system models a real-time flight computer onboard a spacecraft, built on the ESP32 RTOS architecture. The system is responsible for executing periodic background telemetry tasks (simulating sensor data processing, signal filtering, and data encryption) while maintaining strict responsiveness to asynchronous, high-priority ground commands.</p>
+    <p>The primary objective of this architecture is measuring and optimizing Interrupt Service Routine (ISR) latency. Ground commands are triggered via a hardware interrupt (GPIO 18), which utilizes both binary semaphores and direct task notifications to wake high-priority response tasks. The system is stressed under a multi-tiered Rate Monotonic Scheduling (RMS) load to demonstrate predictable execution and guaranteed deadlines even under heavy CPU contention.</p>
+
+    <h2>Demo Video</h2>
+    <div class="video-container">
+        <p><em>[Insert your YouTube video link here once you record it]</em></p>
+    </div>
+
+    <h2>Task Table & WCET Evidence</h2>
+    <table>
+        <tr>
+            <th>Task Name</th>
+            <th>Function / Theme</th>
+            <th>Priority</th>
+            <th>Period</th>
+            <th>Target Deadline</th>
+        </tr>
+        <tr>
+            <td><code>button_isr</code></td>
+            <td>Hardware Interrupt Handler</td>
+            <td>N/A</td>
+            <td>Aperiodic</td>
+            <td>&lt; 1 ms</td>
+        </tr>
+        <tr>
+            <td><code>btn_task_sem</code></td>
+            <td>Ground Command Ack (Semaphore)</td>
+            <td>12</td>
+            <td>Aperiodic</td>
+            <td>Soft</td>
+        </tr>
+        <tr>
+            <td><code>btn_task_notif</code></td>
+            <td>Ground Command Ack (Direct Notif)</td>
+            <td>12</td>
+            <td>Aperiodic</td>
+            <td>Soft</td>
+        </tr>
+        <tr>
+            <td><code>load_task_a</code></td>
+            <td>Xorshift32 (High-Freq Telemetry)</td>
+            <td>15</td>
+            <td>10 ms</td>
+            <td>10 ms</td>
+        </tr>
+        <tr>
+            <td><code>load_task_d</code></td>
+            <td>Insertion Sort (Memory Scrubber)</td>
+            <td>2</td>
+            <td>100 ms</td>
+            <td>100 ms</td>
+        </tr>
+    </table>
+
+    <h2>Hazard Analysis & Mitigation</h2>
+    <table>
+        <tr>
+            <th>Hazard / Fault</th>
+            <th>System Impact</th>
+            <th>Mitigation Strategy</th>
+        </tr>
+        <tr>
+            <td><strong>Switch Bouncing / Signal Noise</strong></td>
+            <td>Spurious ISR triggers causing high-priority task starvation.</td>
+            <td>Software debounce implemented; edges within <code>DEBOUNCE_US</code> (200µs) are dropped.</td>
+        </tr>
+        <tr>
+            <td><strong>Ground Command Flood (Induced Fault)</strong></td>
+            <td>Overwhelms scheduler, causing telemetry tasks to miss deadlines.</td>
+            <td><strong>Degradation Mode:</strong> System detects rapid press count (>5) and gracefully throttles processing, prioritizing safe state over standard telemetry.</td>
+        </tr>
+    </table>
+
+</body>
+</html>
