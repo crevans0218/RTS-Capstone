@@ -16,20 +16,17 @@
 </head>
 <body>
 
-    <!-- 1. Project Overview -->
     <h1>Spacecraft Ground Command Telemetry Node</h1>
+    
     <h2>Project Overview</h2>
     <p>This system models a real-time flight computer onboard a spacecraft, built on the ESP32 RTOS architecture. The system is responsible for executing periodic background telemetry tasks (simulating sensor data processing, signal filtering, and data encryption) while maintaining strict responsiveness to asynchronous, high-priority ground commands.</p>
     <p>The primary objective of this architecture is measuring and optimizing Interrupt Service Routine (ISR) latency. Ground commands are triggered via a hardware interrupt (GPIO 18), which utilizes both binary semaphores and direct task notifications to wake high-priority response tasks. The system is stressed under a multi-tiered Rate Monotonic Scheduling (RMS) load to demonstrate predictable execution and guaranteed deadlines even under heavy CPU contention.</p>
 
-    <!-- 2. Embedded Video -->
     <h2>Demo Video</h2>
     <div class="video-container">
-        <!-- Replace YOUR_VIDEO_ID with the actual ID from your YouTube link -->
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/YOUR_VIDEO_ID" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/IRq2U84foik" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
 
-    <!-- 3. System Architecture Diagram -->
     <h2>System Architecture Diagram</h2>
     <div class="mermaid">
         graph TD
@@ -44,7 +41,6 @@
             D --> I
     </div>
 
-    <!-- 4. Task Table + WCET Evidence -->
     <h2>Task Table & WCET Evidence</h2>
     <table>
         <tr>
@@ -84,7 +80,6 @@
         </tr>
     </table>
 
-    <!-- 5. Hazard Analysis + Industry Standard Mapping -->
     <h2>Hazard Analysis & Industry Standard Mapping</h2>
     <table>
         <tr>
