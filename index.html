@@ -24,7 +24,22 @@
 
     <h2>Demo Video</h2>
     <div class="video-container">
-        <p><em>[Insert your YouTube video link here once you record it]</em></p>
+        <!-- Replace YOUR_VIDEO_ID with the actual ID from your YouTube link -->
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/YOUR_VIDEO_ID" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+
+    <h2>System Architecture Diagram</h2>
+    <div class="mermaid">
+        graph TD
+            A[Ground Command Rx <br> GPIO 18 Button] -->|Hardware Interrupt| B(button_isr)
+            B -.->|Binary Semaphore| C[btn_task_sem <br> Priority 12]
+            B -.->|Direct Notification| D[btn_task_notif <br> Priority 12]
+            E[load_task_a <br> Pri 15 - 10ms] 
+            F[load_task_b <br> Pri 10 - 20ms]
+            G[load_task_c <br> Pri 5 - 50ms]
+            H[load_task_d <br> Pri 2 - 100ms]
+            C --> I[Serial Output / Log]
+            D --> I
     </div>
 
     <h2>Task Table & WCET Evidence</h2>
@@ -92,5 +107,10 @@
         </tr>
     </table>
 
+    <!-- This script automatically renders the System Architecture Diagram for you -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true });
+    </script>
 </body>
 </html>
