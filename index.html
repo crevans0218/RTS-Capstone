@@ -16,18 +16,20 @@
 </head>
 <body>
 
+    <!-- 1. Project Overview -->
     <h1>Spacecraft Ground Command Telemetry Node</h1>
-    
     <h2>Project Overview</h2>
     <p>This system models a real-time flight computer onboard a spacecraft, built on the ESP32 RTOS architecture. The system is responsible for executing periodic background telemetry tasks (simulating sensor data processing, signal filtering, and data encryption) while maintaining strict responsiveness to asynchronous, high-priority ground commands.</p>
     <p>The primary objective of this architecture is measuring and optimizing Interrupt Service Routine (ISR) latency. Ground commands are triggered via a hardware interrupt (GPIO 18), which utilizes both binary semaphores and direct task notifications to wake high-priority response tasks. The system is stressed under a multi-tiered Rate Monotonic Scheduling (RMS) load to demonstrate predictable execution and guaranteed deadlines even under heavy CPU contention.</p>
 
+    <!-- 2. Embedded Video -->
     <h2>Demo Video</h2>
     <div class="video-container">
         <!-- Replace YOUR_VIDEO_ID with the actual ID from your YouTube link -->
         <iframe width="560" height="315" src="https://www.youtube.com/embed/YOUR_VIDEO_ID" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
 
+    <!-- 3. System Architecture Diagram -->
     <h2>System Architecture Diagram</h2>
     <div class="mermaid">
         graph TD
@@ -42,70 +44,69 @@
             D --> I
     </div>
 
+    <!-- 4. Task Table + WCET Evidence -->
     <h2>Task Table & WCET Evidence</h2>
     <table>
         <tr>
             <th>Task Name</th>
-            <th>Function / Theme</th>
             <th>Priority</th>
             <th>Period</th>
             <th>Target Deadline</th>
+            <th>WCET (Measured Evidence)</th>
         </tr>
         <tr>
             <td><code>button_isr</code></td>
-            <td>Hardware Interrupt Handler</td>
             <td>N/A</td>
             <td>Aperiodic</td>
             <td>&lt; 1 ms</td>
+            <td>Observe on Logic Analyzer</td>
         </tr>
         <tr>
             <td><code>btn_task_sem</code></td>
-            <td>Ground Command Ack (Semaphore)</td>
             <td>12</td>
             <td>Aperiodic</td>
             <td>Soft</td>
+            <td>2824 us</td>
         </tr>
         <tr>
             <td><code>btn_task_notif</code></td>
-            <td>Ground Command Ack (Direct Notif)</td>
             <td>12</td>
             <td>Aperiodic</td>
             <td>Soft</td>
+            <td>2682 us</td>
         </tr>
         <tr>
             <td><code>load_task_a</code></td>
-            <td>Xorshift32 (High-Freq Telemetry)</td>
             <td>15</td>
             <td>10 ms</td>
             <td>10 ms</td>
-        </tr>
-        <tr>
-            <td><code>load_task_d</code></td>
-            <td>Insertion Sort (Memory Scrubber)</td>
-            <td>2</td>
-            <td>100 ms</td>
-            <td>100 ms</td>
+            <td>Simulated Load</td>
         </tr>
     </table>
 
-    <h2>Hazard Analysis & Mitigation</h2>
+    <!-- 5. Hazard Analysis + Industry Standard Mapping -->
+    <h2>Hazard Analysis & Industry Standard Mapping</h2>
     <table>
         <tr>
             <th>Hazard / Fault</th>
             <th>System Impact</th>
             <th>Mitigation Strategy</th>
+            <th>Standard Mapping</th>
         </tr>
         <tr>
-            <td><strong>Switch Bouncing / Signal Noise</strong></td>
+            <td><strong>Signal Noise</strong></td>
             <td>Spurious ISR triggers causing high-priority task starvation.</td>
-            <td>Software debounce implemented; edges within <code>DEBOUNCE_US</code> (200µs) are dropped.</td>
+            <td>Software debounce implemented; edges within 200µs are dropped.</td>
+            <td>DO-178C (Robustness)</td>
         </tr>
         <tr>
-            <td><strong>Ground Command Flood (Induced Fault)</strong></td>
+            <td><strong>Command Flood</strong></td>
             <td>Overwhelms scheduler, causing telemetry tasks to miss deadlines.</td>
-            <td><strong>Degradation Mode:</strong> System detects rapid press count (>5) and gracefully throttles processing, prioritizing safe state over standard telemetry.</td>
+            <td>System detects rapid press count, resets bounds, and yields to protect stability.</td>
+            <td>MISRA C:2012 (Defensive programming)</td>
         </tr>
     </table>
+
     <script type="module">
         import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
         mermaid.initialize({ startOnLoad: true });
